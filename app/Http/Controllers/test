@@ -1,0 +1,24 @@
+    public function getToken() {
+        try {
+            $device = new Device();
+            $device->token = Device::generateToken();
+            $device->latitude = $this->request->get("latitude");
+            $device->longitude = $this->request->get("longitude");
+            $device->title = !empty($this->request->get("title")) ? $this->request->get("title") . '-' . time() : 'Device-' . time();
+            if (!$device->save()) {
+                echo '{"success": false, "message": "Could not save device", "token": null}';
+                exit;
+            } else {
+                $response = [
+                    'success' => true,
+                    'message' => 'Success',
+                    'token' => $device->token
+                ];
+                echo json_encode($response);
+                exit;
+            }
+        } catch (\Exception $e) {
+            echo '{"success": false, "message": "Could not save device", "token": null}';
+            exit;
+        }
+    }

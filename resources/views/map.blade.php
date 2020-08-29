@@ -88,7 +88,7 @@
                 }
 
                 function toggleHeatLayer() {
-                    heatmap.setMap(mode ? map : null);
+                    heatmap.setMap(heatmode ? map : null);
                 }
 
                 // Sets the map on all markers in the array.

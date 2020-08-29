@@ -40,6 +40,7 @@ class SensorDataController extends Controller
     }
 
     public function getdata() {
+
         if (! empty($this->requestBody)) {
             $this->request->merge(['sensor_types' => ! empty($this->requestBody->sensor_types) ? $this->requestBody->sensor_types : null]);
         }
@@ -60,18 +61,21 @@ class SensorDataController extends Controller
         }
 
         $data['device_id'] = $this->device->id;
+        try {
+            $payLoad = $data;
+            $this->device->last_data = json_encode($data['sensor_types']);
+            unset($data['sensor_types']);
+            foreach ($payLoad['sensor_types'] as $typeId => $value) {
+                $data['sensor_type'] = $typeId;
+                $data['value'] = $value;
+                SensorData::query()->create($data);
+            }
+            $this->device->save();
 
-        $payLoad = $data;
-        $this->device->last_data = json_encode($data['sensor_types']);
-        unset($data['sensor_types']);
-        foreach ($payLoad['sensor_types'] as $typeId => $value) {
-            $data['sensor_type'] = $typeId;
-            $data['value'] = $value;
-            SensorData::query()->create($data);
+            echo json_encode(['message' => 'Success', 'success' => true]);
+        } catch (\Exception $e) {
+            echo json_encode(['message' => $e->getMessage(), 'success' => false]);
         }
-        $this->device->save();
-
-        echo json_encode(['message' => 'Success', 'success' => true]);
         exit;
     }
 
